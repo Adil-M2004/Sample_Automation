@@ -1,4 +1,5 @@
 const { chromium } = require('playwright');
+const config = require('./config');
 
 (async () => {
 
@@ -20,10 +21,10 @@ const { chromium } = require('playwright');
 
   await page.getByRole('button', { name: 'Add' }).click();
 
-  await page.getByPlaceholder('First Name').fill('Jacky');
-  await page.getByPlaceholder('Last Name').fill('Ferny');
+  await page.getByPlaceholder('First Name').fill(config.firstName);
+  await page.getByPlaceholder('Last Name').fill(config.lastName);
 
-  await page.locator('.oxd-input-group', { hasText: 'Employee Id' }).locator('input').fill('077654')
+  await page.locator('.oxd-input-group', { hasText: 'Employee Id' }).locator('input').fill(config.employeeID)
 
   await page.getByRole('button', { name: 'Save' }).click();
 
@@ -33,7 +34,7 @@ const { chromium } = require('playwright');
   //WAIT FOR THE TABLE TO APPEAR 
   await page.locator('.oxd-table-body').waitFor({ state: 'visible' });
 
-  while (!(await page.locator('.oxd-table-row', { hasText: '077654' }).isVisible())) {
+  while (!(await page.locator('.oxd-table-row', { hasText: config.employeeID }).isVisible())) {
    const nextButton = page.getByRole('button', { name: num.toString(), exact: true });
     
     // Check if the button exists so we don't time out
