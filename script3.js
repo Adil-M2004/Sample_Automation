@@ -7,7 +7,7 @@ const { chromium } = require('playwright');
     slowMo: 50// Optional: slows down operations by 50ms so you can follow along
   });
 
-  // const num = 2;
+  let num = 2;
 
   const page = await browser.newPage();
   await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login');
@@ -28,17 +28,26 @@ const { chromium } = require('playwright');
   await page.getByRole('button', { name: 'Save' }).click();
 
   //GO back to PIM page
-  // await page.getByRole('link', { name: 'PIM' }).click();
+  await page.getByRole('link', { name: 'PIM' }).click();
 
   //WAIT FOR THE TABLE TO APPEAR 
-  //await this.page.locator('.oxd-table-body').waitFor({ state: 'visible' });
+  await page.locator('.oxd-table-body').waitFor({ state: 'visible' });
 
-  // while(await page.locator('.oxd-table-row', { hasText: '0396' }).isNotVisible()) {
-  //     await page.getByRole('button', { name: num, exact: true }).click();
-  //     num++;
-  // }
-  //  console.log("Employee was found in section"+num)
+  while (!(await page.locator('.oxd-table-row', { hasText: '077654' }).isVisible())) {
+   const nextButton = page.getByRole('button', { name: num.toString(), exact: true });
+    
+    // Check if the button exists so we don't time out
+    if (await nextButton.isVisible()) {
+        await nextButton.click();
+        num++;
+        await page.waitForTimeout(1000); // Give the table time to reload
+    } else {
+        console.log("Employee ID not found after checking all available pages.");
+        break; // Exit the loop if there are no more pages to click
+    }
+   }
 
-  //await browser.close();
+  console.log("Employee was found in section " + num);
+  await browser.close();
 
 })();
