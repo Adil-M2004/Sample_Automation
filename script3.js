@@ -8,13 +8,13 @@ const config = require('./config');
     slowMo: 50// Optional: slows down operations by 50ms so you can follow along
   });
 
-  let num = 2;
+  let num = 1;
 
   const page = await browser.newPage();
   await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login');
 
-  await page.getByRole('textbox', { name: 'Username' }).fill('Admin');
-  await page.getByRole('textbox', { name: 'Password' }).fill('admin123');
+  await page.getByRole('textbox', { name: 'Username' }).fill(config.username);
+  await page.getByRole('textbox', { name: 'Password' }).fill(config.password);
   await page.getByRole('button', { name: 'Login' }).click();
 
   await page.getByRole('link', { name: 'PIM' }).click();
@@ -34,21 +34,23 @@ const config = require('./config');
   //WAIT FOR THE TABLE TO APPEAR 
   await page.locator('.oxd-table-body').waitFor({ state: 'visible' });
 
-  while (!(await page.locator('.oxd-table-row', { hasText: config.employeeID }).isVisible())) {
-   const nextButton = page.getByRole('button', { name: num.toString(), exact: true });
-    
-    // Check if the button exists so we don't time out
-    if (await nextButton.isVisible()) {
-        await nextButton.click();
-        num++;
-        await page.waitForTimeout(1000); // Give the table time to reload
-    } else {
-        console.log("Employee ID not found after checking all available pages.");
-        break; // Exit the loop if there are no more pages to click
-    }
-   }
+  const record = await page.locator('.oxd-table-row', { hasText: config.employeeID }).isVisible()
 
-  console.log("Employee was found in section " + num);
-  await browser.close();
+
+  for (let i = 1; i < 5; i++) {
+    // 1. Click the section button and wait for it to finish
+    await page.getByRole('button', { name: i, exact: true }).click();
+
+    // 2. Re-check if the record exists in THIS section
+    const isFound = await page.locator('.oxd-table-row', { hasText: config.employeeID }).isVisible();
+
+    if (isFound) {
+      console.log("Employee was found in section " + i);
+      break;
+    }
+  }//loop end
+
+ // console.log("Operation Complete");
+   await browser.close();
 
 })();

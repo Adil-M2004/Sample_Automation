@@ -4,8 +4,8 @@ const config = {
     firstName: process.env.firstName,
     lastName: process.env.lastName,
     employeeID: process.env.employeeID,
-    username: process.env.username,
-    password: process.env.passowrd,
+    username: process.env.user,
+    password: process.env.password,
     
     // Optional: Add a helper to ensure required variables are present
     checkEnv: () => {
